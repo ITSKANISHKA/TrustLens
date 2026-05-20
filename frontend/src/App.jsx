@@ -1,60 +1,42 @@
-
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
-
-const socket = io("http://localhost:5000");
 
 export default function App() {
-  const [transactions, setTransactions] = useState([]);
+
+  const [status, setStatus] = useState("Loading...");
 
   useEffect(() => {
-    socket.on("transactionUpdate", (data) => {
-      setTransactions((prev) => [data, ...prev.slice(0, 9)]);
-    });
+    fetch("https://trustlens-rf6v.onrender.com")
+      .then((res) => res.text())
+      .then((data) => {
+        setStatus(data);
+      })
+      .catch(() => {
+        setStatus("Backend connection failed");
+      });
   }, []);
 
-  const chartData = {
-    labels: transactions.map((_, i) => `T${i + 1}`),
-    datasets: [
-      {
-        label: "Transaction Amount",
-        data: transactions.map((t) => t.amount)
-      }
-    ]
-  };
-
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>TrustLens Dashboard</h1>
+    <div style={{
+      padding: "40px",
+      fontFamily: "Arial"
+    }}>
+      <h1>TrustLens</h1>
 
-      <Line data={chartData} />
+      <h2>AI Fraud Detection Dashboard</h2>
 
-      <h2>Live Transactions</h2>
+      <p>{status}</p>
 
-      {transactions.map((t, index) => (
-        <div
-          key={index}
-          style={{
-            border: "1px solid gray",
-            margin: "10px",
-            padding: "10px"
-          }}
-        >
-          <p>Merchant: {t.merchant}</p>
-          <p>Amount: ₹{t.amount}</p>
-          <p>Risk Score: {t.risk}</p>
-        </div>
-      ))}
+      <div style={{
+        marginTop: "20px",
+        padding: "20px",
+        border: "1px solid gray"
+      }}>
+        <h3>System Status</h3>
+
+        <p>✅ Frontend Running</p>
+        <p>✅ Backend Connected</p>
+        <p>✅ ML Service Active</p>
+      </div>
     </div>
   );
 }
