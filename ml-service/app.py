@@ -1,15 +1,16 @@
+from fastapi import FastAPI
 
-from flask import Flask, jsonify
-import random
+app = FastAPI()
 
-app = Flask(__name__)
+@app.get("/")
+def home():
+    return {
+        "message": "TrustLens ML Service Running"
+    }
 
-@app.route('/predict')
+@app.get("/predict")
 def predict():
-    return jsonify({
-        "risk_score": random.randint(1,100),
-        "fraud_probability": round(random.random(),2)
-    })
-
-if __name__ == '__main__':
-    app.run(port=8000)
+    return {
+        "fraud_probability": 0.82,
+        "prediction": "Fraud"
+    }
